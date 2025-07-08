@@ -1,103 +1,138 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function Landing() {
+  const [isClient, setIsClient] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+  
+  // 클라이언트에서만 실행되도록 보장
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleGetStarted = () => {
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'code1001') {
+      // 성공! 메인 페이지로 이동
+      router.push('/main');
+    } else {
+      // 틀렸을 때 에러 메시지
+      setError('비밀번호가 틀렸습니다. 다시 시도해주세요.');
+      setPassword('');
+    }
+  };
+
+  const closeModal = () => {
+    setShowPasswordModal(false);
+    setPassword('');
+    setError('');
+  };
+
+  // 클라이언트가 준비되지 않았을 때는 기본 배경만 표시
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          <p className="mt-2 text-white">로딩 중...</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+        className="min-h-screen flex items-center justify-center bg-animate"
+        style={{
+          backgroundImage: "url('/p4.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+          filter: 'blur(3px)'
+        }}
+      >
+        {/* Background overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/60"></div>
+        
+        {/* Content */}
+        <div className="relative z-10 text-center text-white px-6 max-w-4xl content-animate">
+        <h1 className="text-6xl md:text-8xl font-bold mb-6 leading-tight">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+            Code Channel
+          </span>
+        </h1>
+        <p className="text-sm md:text-lg mb-4 opacity-90 leading-relaxed">
+          현직 개발자들과 함께하는 코딩 스터디 모임
+          <br />
+          <code className="bg-black bg-opacity-20 px-3 py-1 rounded font-mono text-white text-xs md:text-sm">
+            npm install friendship --save
+            </code>
+        </p>
+        
+                  {/* Single CTA Button */}
+          <div className="mt-12 button-animate">
+            <button 
+              onClick={handleGetStarted}
+              className="bg-black bg-opacity-20 px-6 py-3 rounded font-mono text-white text-sm md:text-base hover:bg-opacity-30 transform hover:scale-105 transition-all duration-300 shadow-lg border border-white border-opacity-20 cursor-pointer"
+            >
+              Get Started
+            </button>
+          </div>
+              </div>
+
+        {/* Password Modal */}
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+            <div className="bg-gray-900 p-8 rounded-lg border border-gray-700 max-w-md w-full mx-4">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-mono text-white mb-2">Enter Password</h2>
+                <p className="text-gray-400 text-sm font-mono">Access Channel</p>
+        </div>
+              
+              <form onSubmit={handlePasswordSubmit}>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password..."
+                  className="w-full bg-black bg-opacity-20 border border-gray-600 rounded px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-gray-400 transition-colors"
+                  autoFocus
+                />
+                
+                {error && (
+                  <p className="text-red-400 text-sm font-mono mt-2">{error}</p>
+                )}
+                
+                <div className="flex space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="flex-1 bg-red-500 bg-opacity-20 hover:bg-opacity-30 text-white font-mono text-sm py-3 rounded border border-red-500 hover:border-red-400 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-green-500 bg-opacity-20 hover:bg-opacity-30 text-black font-mono text-sm py-3 rounded border border-green-500 hover:border-green-400 transition-all"
+                  >
+                    Enter
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 }

@@ -87,20 +87,43 @@ export default function Main() {
     setIsDarkMode(!isDarkMode);
   };
 
-  // 참석/불참석 처리
+  // 참석/불참석 처리 (on/off 방식)
   const handleAttendance = (studyId: string, action: 'attend' | 'skip') => {
     const study = studies.find(s => s.id === studyId);
     if (!study) return;
 
+    const currentSelection = userSelections[studyId];
+    let newSelection: 'attend' | 'skip' | null = null;
+    let newCount = study.participantCount;
+
+    if (currentSelection === action) {
+      // 같은 버튼을 다시 누르면 선택 해제 (off)
+      newSelection = null;
+      if (action === 'attend') {
+        newCount = Math.max(study.participantCount - 1, 0);
+      }
+      // 불참석의 경우 참여자 수에 영향 없음
+    } else {
+      // 다른 버튼을 누르거나 처음 누르는 경우 (on)
+      newSelection = action;
+      if (currentSelection === 'attend' && action === 'skip') {
+        // 참석에서 불참석으로 변경
+        newCount = Math.max(study.participantCount - 1, 0);
+      } else if (currentSelection === 'skip' && action === 'attend') {
+        // 불참석에서 참석으로 변경
+        newCount = Math.min(study.participantCount + 1, study.maxParticipants || 50);
+      } else if (currentSelection === null && action === 'attend') {
+        // 처음 참석 선택
+        newCount = Math.min(study.participantCount + 1, study.maxParticipants || 50);
+      }
+      // 처음 불참석 선택의 경우 참여자 수는 변경 안함
+    }
+
     // 사용자 선택 상태 업데이트
     setUserSelections(prev => ({
       ...prev,
-      [studyId]: action
+      [studyId]: newSelection
     }));
-
-    const newCount = action === 'attend' 
-      ? Math.min(study.participantCount + 1, study.maxParticipants || 50)
-      : Math.max(study.participantCount - 1, 0);
 
     updateStudy(studyId, { participantCount: newCount });
   };

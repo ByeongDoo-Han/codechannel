@@ -15,7 +15,7 @@ export default function Main() {
   const [popupProjectId, setPopupProjectId] = useState<string | null>(null);
   const [isCalendarPopupOpen, setIsCalendarPopupOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [userSelections, setUserSelections] = useState<{ [studyId: string]: 'attend' | 'skip' | null }>({});
+  const [userSelections, setUserSelections] = useState<{ [studyId: string]: 'attend' | 'unattend' | null }>({});
   
   // 클라이언트에서만 실행되도록 보장
   useEffect(() => {
@@ -88,21 +88,12 @@ export default function Main() {
   };
 
   // 참석/불참석 처리
-  const handleAttendance = (studyId: string, action: 'attend' | 'skip') => {
+  const handleAttendance = (studyId: string, action: 'attend' | 'unattend') => {
     const study = studies.find(s => s.id === studyId);
     if (!study) return;
 
-    // 사용자 선택 상태 업데이트
-    setUserSelections(prev => ({
-      ...prev,
-      [studyId]: action
-    }));
-
-    const newCount = action === 'attend' 
-      ? Math.min(study.participantCount + 1, study.maxParticipants || 50)
-      : Math.max(study.participantCount - 1, 0);
-
-    updateStudy(studyId, { participantCount: newCount });
+    setUserSelections(prevSelections => ({ ...prevSelections, [studyId]: action === 'attend' ? 'attend' : 'unattend' }));
+    updateStudy(studyId, { isAttending: action === 'attend' });
   };
 
   // 스터디 상세 팝업 열기/닫기
@@ -481,7 +472,7 @@ export default function Main() {
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{study.name}</h3>
                           <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.time} • {study.participantCount}명 참여
+                            {study.time} • {study.participants.length}명 참여
                           </p>
                         </div>
                       </div>
@@ -504,10 +495,10 @@ export default function Main() {
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAttendance(study.id, 'skip');
+                            handleAttendance(study.id, 'unattend');
                           }}
                           className={`px-4 py-2 text-xs sm:px-3 sm:py-1 rounded-full border transition-colors ${
-                            userSelections[study.id] === 'skip'
+                            userSelections[study.id] === 'unattend'
                               ? (isDarkMode 
                                   ? 'border-red-600 text-white bg-red-600 hover:bg-red-700 active:bg-red-800' 
                                   : 'border-red-500 text-white bg-red-500 hover:bg-red-600 active:bg-red-700')
@@ -938,10 +929,10 @@ export default function Main() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAttendance(popupStudy.id, 'skip');
+                        handleAttendance(popupStudy.id, 'unattend');
                       }}
                       className={`px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium border transition-colors ${
-                        userSelections[popupStudy.id] === 'skip'
+                        userSelections[popupStudy.id] === 'unattend'
                           ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800 active:border-red-800'
                           : 'bg-transparent text-red-600 border-red-600 hover:bg-red-600 hover:text-white active:bg-red-700 active:text-white'
                       }`}

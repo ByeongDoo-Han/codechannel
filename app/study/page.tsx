@@ -39,7 +39,7 @@ export default function Study() {
   
   // 스터디 추가 폼 상태
   const [newStudyForm, setNewStudyForm] = useState({
-    name: '',
+    studyName: '',
     description: '',
     time: '',
     location: '',
@@ -68,20 +68,19 @@ export default function Study() {
     }));
 
     const newCount = action === 'attend' 
-      ? Math.min(study.participantCount + 1, study.maxParticipants || 50)
-      : Math.max(study.participantCount - 1, 0);
+      ? Math.min(study.participants.length + 1, study.maxParticipants || 50)
+      : Math.max(study.participants.length - 1, 0);
 
-    updateStudy(studyId, { participantCount: newCount });
+    updateStudy(studyId, { participants: study.participants });
   };
 
   // 스터디 추가 처리
   const handleAddStudy = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudyForm.name.trim() || !newStudyForm.description.trim()) return;
+    if (!newStudyForm.studyName.trim() || !newStudyForm.description.trim()) return;
 
     const newStudy = {
-      id: Date.now().toString(),
-      name: newStudyForm.name,
+      studyName: newStudyForm.studyName,
       description: newStudyForm.description,
       time: newStudyForm.time,
       location: newStudyForm.location,
@@ -93,9 +92,9 @@ export default function Study() {
       participants: ['운영자']
     };
 
-    addStudy(newStudy);
+    // addStudy(newStudy);
     setNewStudyForm({
-      name: '',
+      studyName: '',
       description: '',
       time: '',
       location: '',
@@ -376,7 +375,7 @@ export default function Study() {
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{study.name}</h3>
                           <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.time} • {study.participantCount}명 참여
+                            {study.time} • {study.participants.length}명 참여
                           </p>
                         </div>
                       </div>
@@ -530,8 +529,8 @@ export default function Study() {
                     </label>
                     <input
                       type="text"
-                      value={newStudyForm.name}
-                      onChange={(e) => setNewStudyForm(prev => ({ ...prev, name: e.target.value }))}
+                      value={newStudyForm.studyName}
+                      onChange={(e) => setNewStudyForm(prev => ({ ...prev, studyName: e.target.value }))}
                       className={`w-full px-4 py-3 sm:px-3 sm:py-2 rounded-lg border ${
                         isDarkMode 
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -759,7 +758,7 @@ export default function Study() {
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                       <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>참여자</h5>
                       <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.participantCount}명
+                        {popupStudy.participants.length}명
                       </p>
                     </div>
                   </div>

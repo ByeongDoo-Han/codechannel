@@ -30,10 +30,10 @@ export default function Study() {
     if (!isClient) return;
     const urlParams = new URLSearchParams(window.location.search);
     const popup = urlParams.get('popup');
-    if (popup && studies.find(s => s.id === popup)) {
+    if (popup && studies.find(s => s.id === (popup))) {
       setPopupStudyId(popup);
       setIsStudyDetailPopupOpen(true);
-      setSelectedStudy(popup);
+      setSelectedStudy(Number(popup));
     }
   }, [isClient, studies, setSelectedStudy]);
   
@@ -41,7 +41,7 @@ export default function Study() {
   const [newStudyForm, setNewStudyForm] = useState({
     name: '',
     description: '',
-    time: '',
+    date:'',
     location: '',
     icon: 'JS',
     color: 'from-blue-500 to-blue-600',
@@ -49,7 +49,7 @@ export default function Study() {
   });
   
   // 현재 선택된 스터디 데이터
-  const currentStudy = studies.find(study => study.id === selectedStudy) || studies[0];
+  const currentStudy = studies.find(study => Number(study.id) === selectedStudy) || studies[0];
 
   // 다크모드 토글
   const toggleDarkMode = () => {
@@ -58,7 +58,7 @@ export default function Study() {
 
   // 참석/불참석 처리
   const handleAttendance = (studyId: string, action: 'attend' | 'skip') => {
-    const study = studies.find(s => s.id === studyId);
+    const study = studies.find(s => s.id === (studyId));
     if (!study) return;
 
     // 사용자 선택 상태 업데이트
@@ -80,14 +80,15 @@ export default function Study() {
     if (!newStudyForm.name.trim() || !newStudyForm.description.trim()) return;
 
     const newStudy = {
-      id: Date.now().toString(),
       name: newStudyForm.name,
       description: newStudyForm.description,
-      time: newStudyForm.time,
       location: newStudyForm.location,
       icon: newStudyForm.icon,
       color: newStudyForm.color,
       status: newStudyForm.status,
+      date: newStudyForm.date,
+      memberCount: 1,
+      createdBy: '운영자',
       participantCount: 1,
       maxParticipants: 10,
       participants: ['운영자']
@@ -97,7 +98,7 @@ export default function Study() {
     setNewStudyForm({
       name: '',
       description: '',
-      time: '',
+      date: '',
       location: '',
       icon: 'JS',
       color: 'from-blue-500 to-blue-600',
@@ -353,12 +354,12 @@ export default function Study() {
                   <div 
                     key={study.id}
                     onClick={() => {
-                      setSelectedStudy(study.id);
-                      setPopupStudyId(study.id);
+                      setSelectedStudy(Number(study.id));
+                      setPopupStudyId(study.id.toString());
                       setIsStudyDetailPopupOpen(true);
                     }}
                     className={`group p-3 sm:p-4 rounded-xl border transition-all cursor-pointer ${
-                      selectedStudy === study.id
+                      selectedStudy === Number(study.id)
                         ? isDarkMode 
                           ? 'border-blue-500 bg-blue-900/30' 
                           : 'border-blue-400 bg-blue-50'
@@ -376,7 +377,7 @@ export default function Study() {
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{study.name}</h3>
                           <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.time} • {study.participantCount}명 참여
+                            {study.date} • {study.participantCount}명 참여
                           </p>
                         </div>
                       </div>
@@ -471,7 +472,7 @@ export default function Study() {
                 
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>시간</span>
-                  <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentStudy.time}</span>
+                  <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentStudy.date}</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -548,8 +549,8 @@ export default function Study() {
                     </label>
                     <input
                       type="text"
-                      value={newStudyForm.time}
-                      onChange={(e) => setNewStudyForm(prev => ({ ...prev, time: e.target.value }))}
+                      value={newStudyForm.date}
+                      onChange={(e) => setNewStudyForm(prev => ({ ...prev, date: e.target.value }))}
                       className={`w-full px-4 py-3 sm:px-3 sm:py-2 rounded-lg border ${
                         isDarkMode 
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -738,7 +739,7 @@ export default function Study() {
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                       <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>시간</h5>
                       <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.time}
+                        {popupStudy.date}
                       </p>
                     </div>
                     
@@ -795,19 +796,7 @@ export default function Study() {
                     >
                       참석
                     </button>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAttendance(popupStudy.id, 'skip');
-                      }}
-                      className={`w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium border transition-colors touch-manipulation ${
-                        userSelections[popupStudy.id] === 'skip'
-                          ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800 active:border-red-800'
-                          : 'bg-transparent text-red-600 border-red-600 hover:bg-red-600 hover:text-white active:bg-red-700 active:text-white'
-                      }`}
-                    >
-                      불참석
-                    </button>
+                    
                     <button
                       onClick={closeStudyDetailPopup}
                       className={`w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation ${

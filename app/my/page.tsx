@@ -12,41 +12,41 @@ export default function My() {
   };
 
   // 더미 데이터
-  const myData = {
-    posts: [
-      { id: 1, title: 'React Hook 사용법 질문드립니다', category: 'Q&A', date: '2024-03-15', views: 23, replies: 5 },
-      { id: 2, title: 'JavaScript 비동기 처리 팁 공유', category: '커뮤니티', date: '2024-03-12', views: 45, replies: 8 },
-      { id: 3, title: 'Algorithm 문제 해결 방법', category: '커뮤니티', date: '2024-03-10', views: 32, replies: 3 }
-    ],
-    comments: [
-      { id: 1, post: 'TypeScript 타입 정의 방법', content: '정말 도움이 되는 글이네요. 감사합니다!', date: '2024-03-14' },
-      { id: 2, post: 'CSS Grid vs Flexbox', content: 'Grid는 2차원 레이아웃에 더 적합한 것 같아요.', date: '2024-03-13' },
-      { id: 3, post: 'Node.js 성능 최적화', content: '캐싱 전략도 중요한 포인트입니다.', date: '2024-03-11' }
-    ],
-    studies: {
-      upcoming: [
-        { id: 1, name: 'JavaScript Deep Dive', date: '2024-03-20', time: '19:00-21:00', location: '스터디룸 A' },
-        { id: 2, name: 'Algorithm Study', date: '2024-03-23', time: '14:00-17:00', location: '스터디룸 B' }
-      ],
-      completed: [
-        { id: 3, name: 'React Study', date: '2024-03-08', time: '20:00-22:00', location: '온라인 (Zoom)' },
-        { id: 4, name: 'JavaScript Deep Dive', date: '2024-03-05', time: '19:00-21:00', location: '스터디룸 A' },
-        { id: 5, name: 'Algorithm Study', date: '2024-03-02', time: '14:00-17:00', location: '스터디룸 B' }
-      ]
-    },
-    codes: [
-      { id: 1, title: 'React Custom Hook 예제', language: 'JavaScript', date: '2024-03-14', likes: 12 },
-      { id: 2, title: 'Python 크롤링 스크립트', language: 'Python', date: '2024-03-10', likes: 8 },
-      { id: 3, title: 'CSS 애니메이션 컴포넌트', language: 'CSS', date: '2024-03-07', likes: 15 }
-    ]
-  };
+  // const myData = {
+  //   posts: [
+  //     { id: 1, title: 'React Hook 사용법 질문드립니다', category: 'Q&A', date: '2024-03-15', views: 23, replies: 5 },
+  //     { id: 2, title: 'JavaScript 비동기 처리 팁 공유', category: '커뮤니티', date: '2024-03-12', views: 45, replies: 8 },
+  //     { id: 3, title: 'Algorithm 문제 해결 방법', category: '커뮤니티', date: '2024-03-10', views: 32, replies: 3 }
+  //   ],
+  //   comments: [
+  //     { id: 1, post: 'TypeScript 타입 정의 방법', content: '정말 도움이 되는 글이네요. 감사합니다!', date: '2024-03-14' },
+  //     { id: 2, post: 'CSS Grid vs Flexbox', content: 'Grid는 2차원 레이아웃에 더 적합한 것 같아요.', date: '2024-03-13' },
+  //     { id: 3, post: 'Node.js 성능 최적화', content: '캐싱 전략도 중요한 포인트입니다.', date: '2024-03-11' }
+  //   ],
+  //   studies: {
+  //     upcoming: [
+  //       { id: 1, name: 'JavaScript Deep Dive', date: '2024-03-20', time: '19:00-21:00', location: '스터디룸 A' },
+  //       { id: 2, name: 'Algorithm Study', date: '2024-03-23', time: '14:00-17:00', location: '스터디룸 B' }
+  //     ],
+  //     completed: [
+  //       { id: 3, name: 'React Study', date: '2024-03-08', time: '20:00-22:00', location: '온라인 (Zoom)' },
+  //       { id: 4, name: 'JavaScript Deep Dive', date: '2024-03-05', time: '19:00-21:00', location: '스터디룸 A' },
+  //       { id: 5, name: 'Algorithm Study', date: '2024-03-02', time: '14:00-17:00', location: '스터디룸 B' }
+  //     ]
+  //   },
+  //   codes: [
+  //     { id: 1, title: 'React Custom Hook 예제', language: 'JavaScript', date: '2024-03-14', likes: 12 },
+  //     { id: 2, title: 'Python 크롤링 스크립트', language: 'Python', date: '2024-03-10', likes: 8 },
+  //     { id: 3, title: 'CSS 애니메이션 컴포넌트', language: 'CSS', date: '2024-03-07', likes: 15 }
+  //   ]
+  // };
 
-  const tabs = [
-    { id: 'posts', label: '내 게시물', count: myData.posts.length },
-    { id: 'comments', label: '내 댓글', count: myData.comments.length },
-    { id: 'studies', label: '참석 스터디', count: myData.studies.upcoming.length + myData.studies.completed.length },
-    { id: 'codes', label: '내 코드', count: myData.codes.length }
-  ];
+  // const tabs = [
+  //   { id: 'posts', label: '내 게시물', count: myData.posts.length },
+  //   { id: 'comments', label: '내 댓글', count: myData.comments.length },
+  //   { id: 'studies', label: '참석 스터디', count: myData.studies.upcoming.length + myData.studies.completed.length },
+  //   { id: 'codes', label: '내 코드', count: myData.codes.length }
+  // ];
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>

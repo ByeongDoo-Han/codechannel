@@ -1,8 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface AuthContextType {
+  isLoggedIn: boolean;
+  login: (token: string) => void;
+  logout: () => void;
   isLoginModalOpen: boolean;
   isSignupModalOpen: boolean;
   isForgotPasswordModalOpen: boolean;
@@ -25,9 +28,27 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const login = (token: string) => {
+    localStorage.setItem('accessToken', token);
+    setIsLoggedIn(true);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('accessToken');
+    setIsLoggedIn(false);
+  };
 
   const openLoginModal = () => {
     setIsLoginModalOpen(true);
@@ -60,6 +81,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const value = {
+    isLoggedIn,
+    login,
+    logout,
     isLoginModalOpen,
     isSignupModalOpen,
     isForgotPasswordModalOpen,

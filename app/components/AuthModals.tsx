@@ -1,10 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function AuthModals() {
   const { 
+    isLoggedIn,
+    login,
+    logout,
     isLoginModalOpen, 
     isSignupModalOpen, 
     isForgotPasswordModalOpen,
@@ -89,14 +93,25 @@ export default function AuthModals() {
   }, [isClient]);
 
   // 로그인 폼 핸들러
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 로그인 처리 로직 (임시로 콘솔에 출력)
-    console.log('로그인 시도:', loginForm);
+    await handleLogin();
+
     // 실제 로그인 처리 후 모달 닫기
-    alert('로그인 기능이 구현되었습니다!');
     closeLoginModal();
     setLoginForm({ email: '', password: '' });
+  };
+
+  const handleLogin = async () => {
+    await axios.post('http://localhost:8080/api/v1/auth/login', {
+      email: loginForm.email,
+      password: loginForm.password,
+    }, {
+      withCredentials: true,
+    })
+    .then(response => {
+        login(response.data.accessToken);
+      })
   };
 
   // 회원가입 폼 핸들러
@@ -111,11 +126,27 @@ export default function AuthModals() {
     
     // 회원가입 처리 로직 (임시로 콘솔에 출력)
     console.log('회원가입 시도:', signupForm);
+    submitSignupForm();
     // 실제 회원가입 처리 후 모달 닫기
     alert('회원가입이 완료되었습니다!');
     closeSignupModal();
     setSignupForm({ name: '', email: '', password: '', confirmPassword: '' });
   };
+
+  const submitSignupForm = async () => {
+    await axios.post('http://localhost:8080/api/v1/auth/register', {
+      name: signupForm.name,
+      email: signupForm.email,
+      password: signupForm.password,
+    }, {
+      withCredentials: true,
+    })
+    .then(response => {
+    })
+    .catch(error => {
+      console.error('회원가입 실패:', error);
+    });
+  }
 
   // 모달 닫기 핸들러
   const handleCloseLogin = () => {
@@ -133,6 +164,11 @@ export default function AuthModals() {
     setForgotPasswordForm({ email: '' });
     setForgotPasswordStep(1);
   };
+
+  const handleLogout = () => {
+    logout();
+  };
+
 
   // 비밀번호 찾기 폼 핸들러
   const handleForgotPasswordSubmit = (e: React.FormEvent) => {
@@ -243,6 +279,7 @@ export default function AuthModals() {
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-md"
+                onClick={handleLoginSubmit}
               >
                 로그인
               </button>
@@ -391,6 +428,7 @@ export default function AuthModals() {
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-md"
+                onClick={handleSignupSubmit}
               >
                 회원가입
               </button>

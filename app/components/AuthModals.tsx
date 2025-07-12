@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function AuthModals() {
   const { 
@@ -102,6 +103,8 @@ export default function AuthModals() {
     setLoginForm({ email: '', password: '' });
   };
 
+  const router = useRouter();
+
   const handleLogin = async () => {
     await axios.post('http://localhost:8080/api/v1/auth/login', {
       email: loginForm.email,
@@ -109,13 +112,19 @@ export default function AuthModals() {
     }, {
       withCredentials: true,
     })
-    .then(response => {
-        login(response.data.accessToken);
-      })
+    .then(
+      (response) => {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        router.push('/');
+      }
+    )
+    .catch((error) => {
+      console.error('로그인 실패:', error);
+    });
   };
 
   // 회원가입 폼 핸들러
-  const handleSignupSubmit = (e: React.FormEvent) => {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // 비밀번호 확인 검증
@@ -126,7 +135,7 @@ export default function AuthModals() {
     
     // 회원가입 처리 로직 (임시로 콘솔에 출력)
     console.log('회원가입 시도:', signupForm);
-    submitSignupForm();
+    await submitSignupForm();
     // 실제 회원가입 처리 후 모달 닫기
     alert('회원가입이 완료되었습니다!');
     closeSignupModal();
@@ -142,6 +151,7 @@ export default function AuthModals() {
       withCredentials: true,
     })
     .then(response => {
+      console.log('회원가입 성공:', response);
     })
     .catch(error => {
       console.error('회원가입 실패:', error);

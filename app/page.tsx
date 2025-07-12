@@ -18,16 +18,38 @@ export default function Main() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [userSelections, setUserSelections] = useState<{ [studyId: string]: 'attend' | 'skip' | null }>({});
   
+  // Auth Context 사용
+  const { openLoginModal, openSignupModal, isLoggedIn, logout, joinedStudies } = useAuth();
+  
   // 클라이언트에서만 실행되도록 보장
   useEffect(() => {
     setIsClient(true);
+    // 클라이언트에서만 실행되도록 보장
+    // joinedStudies가 로드되면 userSelections 초기화
+    if (isLoggedIn && joinedStudies.length > 0) {
+      const initialSelections: { [studyId: string]: 'attend' | 'skip' | null } = {};
+      console.log('joinedStudies', joinedStudies);
+      joinedStudies.forEach(studyId => {
+        initialSelections[studyId] = 'attend';
+      });
+      console.log('initialSelections', initialSelections);
+      setUserSelections(initialSelections);
+    }
+  }, [isLoggedIn, joinedStudies]);
+
+  useEffect(() => {
+    if (isLoggedIn && joinedStudies.length > 0) {
+      const newSelections: { [studyId: string]: 'attend' | 'skip' | null } = {};
+      joinedStudies.forEach(studyId => {
+        newSelections[studyId] = 'attend';
+      });
+      setUserSelections(newSelections);
+    }
   }, []);
   
   // 스터디 Context 사용
   const { studies, updateStudy } = useStudy();
   
-  // Auth Context 사용
-  const { openLoginModal, openSignupModal, isLoggedIn, logout } = useAuth();
   
   // 프로젝트 데이터 (메인 페이지용 샘플)
   const projectData = {
@@ -97,17 +119,27 @@ export default function Main() {
     let newSelection: 'attend' | 'skip' | null = null;
     let newCount = study.participantCount;
 
-    if (currentSelection === 'attend') {
+    if (currentSelection === action) {
       // 같은 버튼을 다시 누르면 선택 해제 (off)
-      newSelection = 'skip';
+      newSelection = null;
       if (action === 'attend') {
         newCount = Math.max(study.participantCount - 1, 0);
-        handleJoin(Number(study.id));
+        handleUnjoin(Number(study.id));
       }
     } else {
       // 다른 버튼을 누르거나 처음 누르는 경우 (on)
       newSelection = action;
-      handleUnjoin(Number(study.id));
+      if (action === 'attend') {
+        if (currentSelection !== 'skip') {
+          newCount = Math.min(study.participantCount + 1, study.maxParticipants || 50);
+        }
+        handleJoin(Number(study.id));
+      } else { // action === 'skip'
+        if (currentSelection === 'attend') {
+          newCount = Math.max(study.participantCount - 1, 0);
+        }
+        handleUnjoin(Number(study.id));
+      }
     }
 
     // 사용자 선택 상태 업데이트
@@ -574,8 +606,7 @@ export default function Main() {
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAttendance(study.id);
-                            handleJoin(Number(study.id));
+                            handleAttendance(study.id, 'attend');
                           }}
                           className={`px-4 py-2 text-xs sm:px-3 sm:py-1 rounded-full border transition-colors ${
                             userSelections[study.id] === 'attend'
@@ -586,6 +617,7 @@ export default function Main() {
                                   ? 'border-green-600 text-green-600 bg-transparent hover:bg-green-600 hover:text-white active:bg-green-700 active:text-white' 
                                   : 'border-green-500 text-green-500 bg-transparent hover:bg-green-500 hover:text-white active:bg-green-600 active:text-white')
                           }`}>{userSelections[study.id] === 'attend' ? '참석' : '참석'}</button>
+                      
                       </div>
                     </div>
                   </div>
@@ -1004,8 +1036,9 @@ export default function Main() {
                           : 'bg-transparent text-green-600 border-green-600 hover:bg-green-600 hover:text-white active:bg-green-700 active:text-white'
                       }`}
                     >
-                      {userSelections[popupStudy.id] === 'attend' ? '참석' : '참석'}
+                      {userSelections[popupStudy.id] === 'attend' ? 'join' : '참석'}
                     </button>
+                    
                     <button
                       onClick={closeStudyDetailPopup}
                       className={`px-4 py-2 rounded-lg font-medium ${

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import axios from 'axios';
 
 interface AuthContextType {
   isLoggedIn: boolean;
   login: (token: string) => void;
   logout: () => void;
+  joinedStudies: number[];
   isLoginModalOpen: boolean;
   isSignupModalOpen: boolean;
   isForgotPasswordModalOpen: boolean;
@@ -32,17 +34,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
+  const [joinedStudies, setJoinedStudies] = useState<string[]>([]);
+
+  const fetchJoinedStudies = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/join/studies', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      setJoinedStudies(response.data.map((study: any) => study.groupId));
+    } catch (error) {
+      console.error('Failed to fetch joined studies:', error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       setIsLoggedIn(true);
+      fetchJoinedStudies();
     }
   }, []);
 
   const login = (token: string) => {
     localStorage.setItem('accessToken', token);
     setIsLoggedIn(true);
+    fetchJoinedStudies();
   };
 
   const logout = () => {
@@ -87,6 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoginModalOpen,
     isSignupModalOpen,
     isForgotPasswordModalOpen,
+    joinedStudies,
     openLoginModal,
     closeLoginModal,
     openSignupModal,

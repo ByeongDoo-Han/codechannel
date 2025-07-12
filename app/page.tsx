@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { StudyData, useStudy } from './context/StudyContext';
 import { useAuth } from './context/AuthContext';
 import axios from 'axios';
+import AddStudyModal from './components/AddStudyModal';
 
 export default function Main() {
   // Hydration-safe 상태 관리
@@ -17,9 +18,10 @@ export default function Main() {
   const [isCalendarPopupOpen, setIsCalendarPopupOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [userSelections, setUserSelections] = useState<{ [studyId: string]: 'attend' | 'skip' | null }>({});
+  const [isAddStudyModalOpen, setIsAddStudyModalOpen] = useState(false);
   
   // Auth Context 사용
-  const { openLoginModal, openSignupModal, isLoggedIn, logout, joinedStudies } = useAuth();
+  const {openLoginModal, openSignupModal, isLoggedIn, logout, joinedStudies } = useAuth();
   
   // 클라이언트에서만 실행되도록 보장
   useEffect(() => {
@@ -50,6 +52,9 @@ export default function Main() {
   // 스터디 Context 사용
   const { studies, updateStudy } = useStudy();
   
+  const handleAddStudy = () => {
+    setIsAddStudyModalOpen(true);
+  };
   
   // 프로젝트 데이터 (메인 페이지용 샘플)
   const projectData = {
@@ -184,6 +189,14 @@ export default function Main() {
     setSelectedDate(null);
   };
 
+  const openAddStudyModal = () => {
+    setIsAddStudyModalOpen(true);
+  };
+
+  const closeAddStudyModal = () => {
+    setIsAddStudyModalOpen(false);
+  };
+
   // 특정 날짜에 스터디 일정이 있는지 확인
   const getStudiesForDate = (date: Date) => {
     const dateString = date.toISOString().split('T')[0];
@@ -202,8 +215,6 @@ export default function Main() {
     return getStudiesForDate(date).length > 0;
   };
 
-
-  
   // 이전/다음 달로 이동
   const goToPrevMonth = () => {
     setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
@@ -271,6 +282,7 @@ export default function Main() {
     )
     .then(response => {
       console.log('불참석 성공:', response.data);
+      window.location.reload();
     })
     .catch(error => {
       console.error(error);
@@ -293,6 +305,7 @@ export default function Main() {
     )
     .then(response => {
       console.log('참석 성공:', response.data);
+      window.location.reload();
     })
     .catch(error => {
       console.error(error);
@@ -394,6 +407,9 @@ export default function Main() {
               <a href="/info-share" className={`transition-colors font-medium text-base ${
                 isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
               }`}>정보 공유</a>
+              <a href="/patch-history" className={`transition-colors font-medium text-base ${
+                isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}>패치 이력</a>
             </div>
 
             {/* Desktop Right Side */}
@@ -575,7 +591,18 @@ export default function Main() {
                 ? 'bg-gray-800/70 border-gray-700' 
                 : 'bg-white/70 border-gray-200'
             }`}>
+              <div className="flex justify-between items-center">
               <h2 className={`text-lg sm:text-xl font-semibold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>진행 중인 스터디</h2>
+              <button 
+                    onClick={openAddStudyModal}
+                    className={`transition-colors font-medium text-base ${
+                      isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    스터디 추가
+                  </button>
+              </div>
+              
               <div className="space-y-3 sm:space-y-4">
                 {studies.map((study: StudyData) => (
                   <div 
@@ -1289,6 +1316,14 @@ export default function Main() {
           </div>
         );
       })()}
+      {isAddStudyModalOpen && (
+        <AddStudyModal
+          isStudyModalOpen={isAddStudyModalOpen}
+          closeAddStudyModal={closeAddStudyModal}
+          isDarkMode={isDarkMode}
+          handleAddStudy={handleAddStudy}
+        />
+      )}
     </div>
   );
 } 

@@ -17,6 +17,8 @@ interface AuthContextType {
   closeSignupModal: () => void;
   openForgotPasswordModal: () => void;
   closeForgotPasswordModal: () => void;
+  openAddStudyModal: () => void;
+  closeAddStudyModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,8 +36,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
-  const [joinedStudies, setJoinedStudies] = useState<string[]>([]);
-
+  const [joinedStudies, setJoinedStudies] = useState<number[]>([]);
+  const [isAddStudyModalOpen, setIsAddStudyModalOpen] = useState(false);
   const fetchJoinedStudies = async () => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
@@ -65,17 +67,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('accessToken', token);
     setIsLoggedIn(true);
     fetchJoinedStudies();
+    window.location.reload();
   };
 
   const logout = () => {
     localStorage.removeItem('accessToken');
     setIsLoggedIn(false);
+    setJoinedStudies([]);
+    setIsLoginModalOpen(false);
+    window.location.reload();
   };
 
   const openLoginModal = () => {
     setIsLoginModalOpen(true);
     setIsSignupModalOpen(false);
     setIsForgotPasswordModalOpen(false);
+  };
+
+  const openAddStudyModal = () => {
+    setIsAddStudyModalOpen(true);
+  };
+
+  const closeAddStudyModal = () => {
+    setIsAddStudyModalOpen(false);
   };
 
   const closeLoginModal = () => {
@@ -116,6 +130,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     closeSignupModal,
     openForgotPasswordModal,
     closeForgotPasswordModal,
+    openAddStudyModal,
+    closeAddStudyModal,
   };
 
   return (

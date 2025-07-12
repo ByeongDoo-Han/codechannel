@@ -116,6 +116,7 @@ export default function AuthModals() {
       (response) => {
         localStorage.setItem('accessToken', response.data.accessToken);
         router.push('/');
+        window.location.reload();
       }
     )
     .catch((error) => {

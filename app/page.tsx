@@ -13,7 +13,7 @@ export default function Main() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isStudyDetailPopupOpen, setIsStudyDetailPopupOpen] = useState(false);
   const [isProjectDetailPopupOpen, setIsProjectDetailPopupOpen] = useState(false);
-  const [popupStudyId, setPopupStudyId] = useState<string | null>(null);
+  const [popupStudyId, setPopupStudyId] = useState<number | null>(null);
   const [popupProjectId, setPopupProjectId] = useState<string | null>(null);
   const [isCalendarPopupOpen, setIsCalendarPopupOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -117,7 +117,7 @@ export default function Main() {
 
   // 참석/불참석 처리 (on/off 방식)
   const handleAttendance = (studyId: string, action: 'attend' | 'skip') => {
-    const study = studies.find(s => s.id === studyId);
+    const study = studies.find(s => s.id === Number(studyId));
     if (!study) return;
 
     const currentSelection = userSelections[studyId];
@@ -153,11 +153,12 @@ export default function Main() {
       [studyId]: newSelection
     }));
 
-    updateStudy(studyId, { participantCount: newCount });
+    updateStudy(Number(studyId), { participantCount: newCount });
   };
 
+
   // 스터디 상세 팝업 열기/닫기
-  const openStudyDetailPopup = (studyId: string) => {
+  const openStudyDetailPopup = (studyId: number) => {
     setPopupStudyId(studyId);
     setIsStudyDetailPopupOpen(true);
   };
@@ -342,31 +343,33 @@ export default function Main() {
   ];
 
   // 클라이언트가 준비되지 않았을 때는 기본 레이아웃만 표시
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white/80 shadow-sm border-b border-gray-200">
-          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <nav className="flex justify-between items-center">
-              <div className="flex items-center">
-                <a href="/main" className="text-xl sm:text-2xl font-bold">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-                    Code Channel
-                  </span>
-                </a>
-              </div>
-            </nav>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600">로딩 중...</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // if (!isClient) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50">
+  //       <header className="bg-white/80 shadow-sm border-b border-gray-200">
+  //         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+  //           <nav className="flex justify-between items-center">
+  //             <div className="flex items-center">
+  //               <a href="/main" className="text-xl sm:text-2xl font-bold">
+  //                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+  //                   Code Channel
+  //                 </span>
+  //               </a>
+  //             </div>
+  //           </nav>
+  //         </div>
+  //       </header>
+  //       <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
+  //         <div className="text-center py-8">
+  //           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+  //           <p className="mt-2 text-gray-600">로딩 중...</p>
+  //         </div>
+  //       </main>
+  //     </div>
+  //   );
+  // }
+
+  const popupStudy = popupStudyId ? studies.find(s => s.id === Number(popupStudyId)) : null;
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -380,7 +383,7 @@ export default function Main() {
           <nav className="flex justify-between items-center">
             {/* Logo */}
             <div className="flex items-center">
-              <a href="/main" className="text-xl sm:text-2xl font-bold">
+              <a href="/" className="text-xl sm:text-2xl font-bold">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
                   Code Channel
                 </span>
@@ -576,7 +579,6 @@ export default function Main() {
           )}
         </div>
       </header>
-
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
         {/* Main Grid */}
@@ -594,7 +596,7 @@ export default function Main() {
               <div className="flex justify-between items-center">
               <h2 className={`text-lg sm:text-xl font-semibold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>진행 중인 스터디</h2>
               <button 
-                    onClick={openAddStudyModal}
+                    onClick={() => openAddStudyModal()}
                     className={`transition-colors font-medium text-base ${
                       isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
                     }`}
@@ -624,7 +626,7 @@ export default function Main() {
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{study.name}</h3>
                           <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.date} • {study.memberCount}명 참여
+                            {study.date.toString()} • {study.memberCount}명 참여
                           </p>
                         </div>
                       </div>
@@ -633,7 +635,7 @@ export default function Main() {
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAttendance(study.id, 'attend');
+                            handleAttendance(study.id.toString(), 'attend');
                           }}
                           className={`px-4 py-2 text-xs sm:px-3 sm:py-1 rounded-full border transition-colors ${
                             userSelections[study.id] === 'attend'
@@ -961,128 +963,124 @@ export default function Main() {
       </main>
 
       {/* 스터디 상세 팝업 */}
-      {isStudyDetailPopupOpen && popupStudyId && (() => {
-        const popupStudy = studies.find(s => s.id === popupStudyId);
-        if (!popupStudy) return null;
-        
-        return (
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96 max-w-[calc(100vw-2rem)]">
-            <div className={`rounded-xl shadow-2xl ${
-              isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            } border`}>
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    스터디 상세 정보
-                  </h3>
-                  <button
-                    onClick={closeStudyDetailPopup}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+      
+      {isStudyDetailPopupOpen && popupStudyId && (
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96 max-w-[calc(100vw-2rem)]">
+        <div className={`rounded-xl shadow-2xl ${
+          isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        } border`}>
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                스터디 상세 정보
+              </h3>
+              <button
+                onClick={closeStudyDetailPopup}
+                className={`p-2 rounded-lg transition-colors ${
+                  isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* 스터디 헤더 */}
+              <div className="flex items-center space-x-4">
+                <div className={`w-16 h-16 bg-gradient-to-br ${popupStudy?.color} rounded-xl flex items-center justify-center`}>
+                  <span className="text-white font-bold text-lg">{popupStudy?.icon}</span>
                 </div>
-
-                <div className="space-y-6">
-                  {/* 스터디 헤더 */}
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${popupStudy.color} rounded-xl flex items-center justify-center`}>
-                      <span className="text-white font-bold text-lg">{popupStudy.icon}</span>
-                    </div>
-                    <div>
-                      <h4 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.name}
-                      </h4>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {popupStudy.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 스터디 정보 그리드 */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>시간</h5>
-                      <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.date}
-                      </p>
-                    </div>
-                    
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>장소</h5>
-                      <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.location}
-                      </p>
-                    </div>
-                    
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>상태</h5>
-                      <span className="inline-flex px-2 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
-                        진행중
-                      </span>
-                    </div>
-                    
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                      <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>참여자</h5>
-                      <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.participantCount}명
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 참여자 목록 */}
-                  <div>
-                    <h5 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      참여자 목록
-                    </h5>
-                    <div className="flex flex-wrap gap-2">
-                      {popupStudy.participants.map((participant: string, index: number) => (
-                        <span key={index} className={`px-3 py-1 text-sm rounded-full ${
-                          isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
-                        }`}>
-                          {participant}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 액션 버튼들 */}
-                  <div className="flex justify-end space-x-3 pt-4 border-t">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAttendance(popupStudy.id, 'attend');
-                      }}
-                      className={`px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium border transition-colors ${
-                        userSelections[popupStudy.id] === 'attend'
-                          ? 'bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 active:bg-green-800 active:border-green-800'
-                          : 'bg-transparent text-green-600 border-green-600 hover:bg-green-600 hover:text-white active:bg-green-700 active:text-white'
-                      }`}
-                    >
-                      {userSelections[popupStudy.id] === 'attend' ? 'join' : '참석'}
-                    </button>
-                    
-                    <button
-                      onClick={closeStudyDetailPopup}
-                      className={`px-4 py-2 rounded-lg font-medium ${
-                        isDarkMode 
-                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      } transition-colors`}
-                    >
-                      닫기
-                    </button>
-                  </div>
+                <div>
+                  <h4 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {popupStudy?.name}
+                  </h4>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {popupStudy?.description}
+                  </p>
                 </div>
+              </div>
+
+              {/* 스터디 정보 그리드 */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>시간</h5>
+                  <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {popupStudy?.date}
+                  </p>
+                </div>
+                
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>장소</h5>
+                  <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {popupStudy?.location}
+                  </p>
+                </div>
+                
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>상태</h5>
+                  <span className="inline-flex px-2 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
+                    진행중
+                  </span>
+                </div>
+                
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>참여자</h5>
+                  <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {popupStudy?.participantCount}명
+                  </p>
+                </div>
+              </div>
+
+              {/* 참여자 목록 */}
+              <div>
+                <h5 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  참여자 목록
+                </h5>
+                <div className="flex flex-wrap gap-2">
+                  {popupStudy?.participants?.map((participant: string, index: number) => (
+                    <span key={index} className={`px-3 py-1 text-sm rounded-full ${
+                      isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {participant}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* 액션 버튼들 */}
+              <div className="flex justify-end space-x-3 pt-4 border-t">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAttendance(popupStudy?.id?.toString() || '', 'attend');
+                  }}
+                  className={`px-6 py-3 sm:px-4 sm:py-2 rounded-lg font-medium border transition-colors ${
+                    userSelections[popupStudy?.id || ''] === 'attend'
+                      ? 'bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 active:bg-green-800 active:border-green-800'
+                      : 'bg-transparent text-green-600 border-green-600 hover:bg-green-600 hover:text-white active:bg-green-700 active:text-white'
+                  }`}
+                >
+                  {userSelections[popupStudy?.id || ''] === 'attend' ? 'join' : '참석'}
+                </button>
+                
+                <button
+                  onClick={closeStudyDetailPopup}
+                  className={`px-4 py-2 rounded-lg font-medium ${
+                    isDarkMode 
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  } transition-colors`}
+                >
+                  닫기
+                </button>
               </div>
             </div>
           </div>
-        );
-      })()}
+        </div>
+      </div>
+      )}
 
       {/* 달력 팝업 */}
       {isCalendarPopupOpen && selectedDate && (
@@ -1119,7 +1117,7 @@ export default function Main() {
                       }`}
                       onClick={() => {
                         closeCalendarPopup();
-                        openStudyDetailPopup(study.id.toString());
+                        openStudyDetailPopup(Number(study.id));
                       }}
                     >
                       <div className="flex items-center space-x-3">
@@ -1131,7 +1129,7 @@ export default function Main() {
                             {study.name}
                           </h4>
                           <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.date} • {study.memberCount}명 참여
+                            {study.date.toString()} • {study.memberCount}명 참여
                           </p>
                         </div>
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">

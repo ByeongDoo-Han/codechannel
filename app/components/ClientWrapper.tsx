@@ -2,7 +2,7 @@
 
 import { StudyProvider } from '../context/StudyContext';
 import { AuthProvider } from '../context/AuthContext';
-import AuthModals from './AuthModals';
+import AuthModals from './auth/AuthModals';
 
 export default function ClientWrapper({ children }: { children: React.ReactNode }) {
   return (

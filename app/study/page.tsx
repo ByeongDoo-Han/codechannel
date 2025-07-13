@@ -30,7 +30,7 @@ export default function Study() {
     if (!isClient) return;
     const urlParams = new URLSearchParams(window.location.search);
     const popup = urlParams.get('popup');
-    if (popup && studies.find(s => s.id === (popup))) {
+    if (popup && studies.find(s => s.id === Number(popup))) {
       setPopupStudyId(popup);
       setIsStudyDetailPopupOpen(true);
       setSelectedStudy(Number(popup));
@@ -57,8 +57,8 @@ export default function Study() {
   };
 
   // 참석/불참석 처리
-  const handleAttendance = (studyId: string, action: 'attend' | 'skip') => {
-    const study = studies.find(s => s.id === (studyId));
+  const handleAttendance = (studyId: number, action: 'attend' | 'skip') => {
+    const study = studies.find(s => s.id === studyId);
     if (!study) return;
 
     // 사용자 선택 상태 업데이트
@@ -377,7 +377,7 @@ export default function Study() {
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{study.name}</h3>
                           <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {study.date} • {study.participantCount}명 참여
+                            {study.date.toString()} • {study.participantCount}명 참여
                           </p>
                         </div>
                       </div>
@@ -472,7 +472,7 @@ export default function Study() {
                 
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>시간</span>
-                  <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentStudy.date}</span>
+                  <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentStudy.date.toString()}</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -693,7 +693,7 @@ export default function Study() {
 
       {/* 스터디 상세 팝업 */}
       {isStudyDetailPopupOpen && popupStudyId && (() => {
-        const popupStudy = studies.find(s => s.id === popupStudyId);
+        const popupStudy = studies.find(s => s.id === Number(popupStudyId));
         if (!popupStudy) return null;
         
         return (
@@ -739,7 +739,7 @@ export default function Study() {
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                       <h5 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>시간</h5>
                       <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {popupStudy.date}
+                        {popupStudy.date.toString()}
                       </p>
                     </div>
                     

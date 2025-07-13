@@ -1,9 +1,10 @@
 'use client';
 
+import axios from 'axios';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface StudyData {
-  id: string;
+  id: number;
   name: string;
   date: Date;
   location: string;
@@ -22,9 +23,10 @@ interface StudyContextType {
   studies: StudyData[];
   selectedStudy: number;
   setSelectedStudy: (id: number) => void;
-  updateStudy: (id: string, data: Partial<StudyData>) => void;
+  updateStudy: (id: number, data: Partial<StudyData>) => void;
   addStudy: (data: StudyData) => void;
-  removeStudy: (id: string) => void;
+  removeStudy: (id: number) => void;
+  openStudyDetailPopup: (studyId: number) => void;
 }
 
 const StudyContext = createContext<StudyContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ const StudyContext = createContext<StudyContextType | undefined>(undefined);
 export function StudyProvider({ children }: { children: ReactNode }) {
   const [studies, setStudies] = useState<StudyData[]>([]);
   const [selectedStudy, setSelectedStudy] = useState<number>(0);
+  const [participants, setParticipants] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchStudies = async () => {
@@ -58,7 +61,22 @@ export function StudyProvider({ children }: { children: ReactNode }) {
     fetchStudies();
   }, []);
 
-  const updateStudy = (id: string, data: Partial<StudyData>) => {
+  useEffect(() => {
+    fetchParticipants(selectedStudy);
+  }, [selectedStudy]);
+
+  const fetchParticipants = async (studyId: number) => {
+    await axios.get(`http://localhost:8080/api/v1/studies/${studyId}`)
+    .then(response => {
+      console.log(response.data.participants);
+      setParticipants(response.data.participants);
+    })
+    .catch(error => {
+      console.error("Failed to fetch participants:", error);
+    })
+  };
+
+  const updateStudy = (id: number, data: Partial<StudyData>) => {
     setStudies(prev => prev.map(study => 
       study.id === id ? { ...study, ...data } : study
     ));
@@ -68,8 +86,12 @@ export function StudyProvider({ children }: { children: ReactNode }) {
     setStudies(prev => [...prev, data]);
   };
 
-  const removeStudy = (id: string) => {
+  const removeStudy = (id: number) => {
     setStudies(prev => prev.filter(study => study.id !== id));
+  };
+
+  const openStudyDetailPopup = (studyId: number) => {
+    setSelectedStudy(studyId);
   };
 
   return (
@@ -79,7 +101,8 @@ export function StudyProvider({ children }: { children: ReactNode }) {
       setSelectedStudy,
       updateStudy,
       addStudy,
-      removeStudy
+      removeStudy,
+      openStudyDetailPopup,
     }}>
       {children}
     </StudyContext.Provider>

@@ -21,7 +21,7 @@ interface UserSelections {
 
 interface StudySectionProps {
   openStudyDetailPopup: (studyId: number) => void;
-  handleAttendance: (studyId: string, action: 'attend' | 'unattend') => void;
+  handleAttendance: (studyId: number, action: 'attend' | 'unattend') => void;
   userSelections: UserSelections;
   isDarkMode: boolean;
 }
@@ -81,11 +81,11 @@ export default function StudySection({openStudyDetailPopup, handleAttendance, us
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleAttendance(study.id.toString(), 'attend');
+                    handleAttendance(study.id, 'attend');
                     handleJoin(study.id);
                   }}
                   className={`px-4 py-2 text-xs sm:px-3 sm:py-1 rounded-full border transition-colors ${
-                    userSelections[study.id.toString()] === 'attend'
+                    userSelections[study.id] === 'attend'
                       ? (isDarkMode 
                           ? 'border-green-600 text-white bg-green-600 hover:bg-green-700 active:bg-green-800' 
                           : 'border-green-500 text-white bg-green-500 hover:bg-green-600 active:bg-green-700')
